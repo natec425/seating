@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html, button, div, text, em, span, node)
 import Html.App as Html
-import Html.Attributes exposing (style, rel, href)
+import Html.Attributes exposing (style, rel, href, src, classList, class, attribute)
 import Html.Events exposing (onClick)
 import Array exposing (Array)
 import Set exposing (Set)
@@ -92,10 +92,20 @@ update a m =
             initial_state
 
 
+stylesheet h =
+    node "link" [ rel "stylesheet", href h ] []
+
+
+script s =
+    node "script" [ src s ] []
+
+
 bootstrap : Html a
 bootstrap =
     div []
-        [ node "link" [ rel "stylesheet", href "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" ] []
+        [ stylesheet "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+        , script "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
         ]
 
 
@@ -131,29 +141,45 @@ viewAssignments assignments =
             Array.indexedMap viewAssignment assignments |> Array.toList
 
         backRow =
-            List.take 4 viewed
+            buffer :: (List.append (List.take 4 viewed) [ buffer ])
 
         middleRow =
-            List.drop 4 viewed |> List.take 4
+            buffer :: (List.append (List.drop 4 viewed |> List.take 4) [ buffer ])
 
         frontRow =
             List.drop 8 viewed
     in
-        div [] [ div [ margin ] backRow, div [ margin ] middleRow, div [ margin ] frontRow ]
+        div [ class "container" ] [ div [ margin, row ] backRow, div [ margin, row ] middleRow, div [ margin, row ] frontRow ]
+
+
+buffer =
+    div [ class "col-md-2" ] []
+
+
+row =
+    class "row"
+
+
+bootButton atts children =
+    button
+        ((classList [ ( "btn", True ), ( "btn-primary", True ) ])
+            :: atts
+        )
+        children
 
 
 viewAssignment : Int -> Maybe String -> Html Action
 viewAssignment i a =
     case a of
         Just name ->
-            em [ margin ] [ text name ]
+            span [ class "col-md-2" ] [ em [] [ text name ] ]
 
         Nothing ->
-            button [ onClick (Assign i) ] [ text "Assign This Seat" ]
+            span [ class "col-md-2" ] [ bootButton [ onClick (Assign i) ] [ text "Assign This Seat" ] ]
 
 
 resetButton =
-    button [ onClick Reset ] [ text "Reset Seating Assignments" ]
+    bootButton [ onClick Reset, class "btn-danger" ] [ text "Reset Seating Assignments" ]
 
 
 subscriptions : Model -> Sub Action
