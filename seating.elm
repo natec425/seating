@@ -1,8 +1,8 @@
 module Main exposing (..)
 
-import Html exposing (Html, button, div, text, em, span, node)
+import Html exposing (Html, button, div, text, em, span, node, h2, h4)
 import Html.App as Html
-import Html.Attributes exposing (style, rel, href, src, classList, class, attribute)
+import Html.Attributes exposing (style, rel, href, src, classList, class, attribute, height)
 import Html.Events exposing (onClick)
 import Array exposing (Array)
 import Set exposing (Set)
@@ -131,7 +131,7 @@ viewUnassigned : Set String -> Html a
 viewUnassigned names =
     Set.toList names
         |> List.map (\n -> span [ margin ] [ text n ])
-        |> div []
+        |> h2 [ height 100 ]
 
 
 viewAssignments : Array (Maybe String) -> Html Action
@@ -172,7 +172,7 @@ viewAssignment : Int -> Maybe String -> Html Action
 viewAssignment i a =
     case a of
         Just name ->
-            span [ class "col-md-2" ] [ em [] [ text name ] ]
+            span [ class "col-md-2" ] [ h4 [] [ text name ] ]
 
         Nothing ->
             span [ class "col-md-2" ] [ bootButton [ onClick (Assign i) ] [ text "Assign This Seat" ] ]
